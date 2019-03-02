@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html ng-app="taskApp">
+<head>
+    <title>Lista de Tarefas</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- <script src="libs/angularjs/1.7.7/angular.min.js"></script> -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/X.Y.Z/angular-messages.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/controllers/homeController.js"></script>
+    <script src="js/controllers/categoryController.js"></script>
+    <script src="js/controllers/taskController.js"></script>
+</head>
+<body style="background-color: green" ng-controller="homeController">
+<div id="container" ng-controller="categoryController">
+    <header>
+        
+        <button type="button" class="btn btn-warning" ng-click="addCategory(task.category)">+Categoria</button>
+        <button type="button" class="btn btn-primary" ng-click="addTask(task)">+Tarefa</button>
+        <button type="button" class="btn btn-secondary" ng-click = "showTasksByCategory() | filter: ocultarBotao = true" ng-show="!ocultarBotao">Listagem por Tarefas</button>
+        <button type="button" class="btn btn-secondary" ng-click = "showTasksByCategory() | filter: ocultarBotao = false" ng-show="ocultarBotao">Tarefas por Categorias</button>
+        
+    </header>  
+    
+    <section ng-hide="ocultarBotao" ng-repeat="category in categories">
+    	<div class="panel panel-primary">
+            <div class="panel-heading">{{category}}</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Tarefa Realizada</th>
+                        <th>Tarefa</th>
+                        <th>Categoria</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="task in tasksByCategory | filter: {category: category}">
+                        <td><input type="checkbox" ng-model="task.done"></td>
+                        <!-- <td>{{task.done}}</td> -->
+                        <td>{{task.name}}</td>
+                        <td>{{task.category}}</td>
+                    </tr>
+                    </tbody>
+                </table>                
+        </div>
+    </section>   
+
+    <section ng-click = "showTasksByCategory() | filter: ocultarBotao = false" ng-show="ocultarBotao"> 
+        <div class="panel panel-primary">
+            <div class="panel-heading">Tarefas Pendentes</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Tarefa Realizada</th>
+                        <th>Tarefa</th>
+                        <th>Categoria</th>
+                    </tr>
+                    </thead>
+                    <tbody ng-show="tasks.length > 0">
+                    <tr ng-repeat="task in tasks | filter: {done: false}">
+                        <td><input type="checkbox" ng-model="task.done"></td>
+                        <!-- <td>{{task.done}}</td> -->
+                        <td>{{task.name}}</td>
+                        <td>{{task.category}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">Tarefas Concluidas</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Tarefa Realizada</th>
+                        <th>Tarefa</th>
+                        <th>Categoria</th>
+                    </tr>
+                    </thead>
+                    <tbody ng-show="tasks.length > 0">
+                    <tr ng-repeat="task in tasks | filter: {done: true}">
+                        <td><input type="checkbox" ng-model="task.done"></td>
+                        <!-- <td>{{task.done}}</td> -->
+                        <td>{{task.name}}</td>
+                        <td>{{task.category}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+    </section>
+
+     <section ng-controller="categoryController" ng-hide="ocultarBotao">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Categorias Disponíveis</div>
+            <div class="panel-body">
+                <form name="categoryForm">
+                    <label>Categoria:</label><input class="form-control" type="text" ng-model="task.category" name="category" placeholder="Nome da Categoria" ng-required="true" ng-minlength="4"/>
+                    <button type="button" class="btn btn-warning" ng-click="addCategory(task.category)">+Categoria</button>                    
+                </form>
+
+               <!--  <div ng-messages="categoryForm.category.$error" class="alert alert-danger">
+                    <div ng-message="riquired">
+                        O campo categoria é obrigatório!
+                    </div>
+                    <div ng-message="minlength">
+                        O campo categoria deve ter no mínimo 4 caracteres.
+                    </div>
+                </div> -->
+
+                <div ng-show = "categoryForm.category.$error.required && taskForm.category.$dirty" class="alert alert-danger">
+                    O campo categoria é obrigatório!
+                </div>
+                <div ng-show = "categoryForm.category.$error.minlength" class="alert alert-danger">
+                    O campo categoria deve ter no mínimo 4 caracteres.
+                </div>
+                
+                <table class="table">                    
+                    <tbody>
+                    <tr ng-repeat="c in categories">                        
+                        <td>{{c}}</td>
+                    </tr>
+                    </tbody>
+                </table>                
+            </div>
+        </div>
+    </section>
+
+    <section ng-controller="taskController" ng-hide="ocultarBotao">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Tarefas</div>
+            <div class="panel-body">                                                   
+                <form name="taskForm">
+                    <label>Tarefa:</label><input class="form-control" type="text" ng-model="task.name" name="name" placeholder="Nome da Tarefa" ng-required="true" ng-minlength="4"/>
+                    <label>Categoria:</label><input class="form-control" type="text" ng-model="task.category" name="category" placeholder="Nome da Categoria" ng-required="true" ng-minlength="4"/>
+                    <label>Tarefa Realizada:</label><input class="form-control" type="text" ng-model="task.done" name="done" placeholder="Status" ng-required="true" ng-minlength="4"/>
+                    <button ng-controller="taskController" type="button" class="btn btn-primary" ng-click="addTask(task)">+Tarefa</button>                                
+                </form>
+                <!-- <div ng-messages="taskForm.name.$error" class="alert alert-danger">  
+                 <div ng-message="riquired">
+                        O campo tarefa é obrigatório!
+                    </div>
+                    <div ng-message="minlength">
+                        O campo nome deve ter no mínimo 4 caracteres.
+                    </div>
+                </div>
+                <div ng-messages="taskForm.category.$error" class="alert alert-danger">
+                    <div ng-message="riquired">
+                        O campo categoria é obrigatório!
+                    </div>
+                    <div ng-message="minlength">
+                        O campo categoria deve ter no mínimo 4 caracteres.
+                    </div>
+                </div>      --> 
+
+                <div ng-show = "taskForm.name.$error.required && taskForm.name.$dirty" class="alert alert-danger">
+                    O campo tarefa é obrigatório!
+                </div>
+                <div ng-show = "taskForm.name.$error.minlength" class="alert alert-danger" class="alert alert-danger">
+                    O campo tarefa deve ter no mínimo 4 caracteres.
+                </div>
+                 <div ng-show = "taskForm.category.$error.required && taskForm.name.$dirty" class="alert alert-danger">
+                    O campo categoria é obrigatório!
+                </div>
+                <div ng-show = "taskForm.category.$error.minlength" class="alert alert-danger">
+                    O campo categoria deve ter no mínimo 4 caracteres.
+                </div>
+                <div ng-show = "taskForm.done.$error.required && taskForm.name.$dirty" class="alert alert-danger">
+                    O campo status: true ou false é obrigatório!
+                </div>               
+                
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Tarefa Realizada</th>
+                        <th>Tarefa</th>
+                        <th>Categoria</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="t in tasks | filter: {task: name}">
+                        <td><input type="checkbox" ng-model="t.done"></td>
+                        <!-- <td>{{task.done}}</td> -->
+                        <td>{{t.name}}</td>
+                        <td>{{t.category}}</td>                        
+                    </tr>
+                    </tbody>
+                </table>                
+            </div>
+        </div>
+    </section>  
+
+</div>
+</body>
+</html>
